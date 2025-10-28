@@ -54,17 +54,9 @@
       transform: scale(1.1);
     }
 
-    .correct {
-      background-color: #32cd32;
-    }
-
-    .present {
-      background-color: orange;
-    }
-
-    .absent {
-      background-color: #555;
-    }
+    .correct { background-color: #32cd32; }
+    .present { background-color: orange; }
+    .absent { background-color: #555; }
 
     #reset {
       padding: 10px 18px;
@@ -131,7 +123,7 @@
   </div>
 
   <script>
-    const answer = "taxes"; // fixed word for now
+    const answer = "taxes"; // fixed answer
     const grid = document.getElementById("grid");
     const resetBtn = document.getElementById("reset");
     const message = document.getElementById("message");
@@ -139,12 +131,13 @@
 
     let currentRow = 0;
     let currentGuess = "";
+    let isMobile = /Mobi|Android/i.test(navigator.userAgent);
 
     function createGrid() {
       grid.innerHTML = "";
       for (let i = 0; i < 30; i++) {
         const cell = document.createElement("div");
-        cell.addEventListener("click", () => focusInput(cell));
+        if (isMobile) cell.addEventListener("click", () => focusInput(cell));
         grid.appendChild(cell);
       }
     }
@@ -156,9 +149,12 @@
       }
     }
 
-    function focusInput(cell) {
+    function focusInput() {
       mobileInput.focus();
-      mobileInput.oninput = (e) => {
+    }
+
+    if (isMobile) {
+      mobileInput.addEventListener("input", (e) => {
         const val = e.target.value.toLowerCase();
         e.target.value = "";
         if (/^[a-z]$/.test(val)) {
@@ -167,7 +163,21 @@
             updateGrid();
           }
         }
-      };
+      });
+    } else {
+      document.addEventListener("keydown", (e) => {
+        if (currentRow >= 6) return;
+
+        if (e.key === "Enter" && currentGuess.length === 5) {
+          checkGuess();
+        } else if (e.key === "Backspace") {
+          currentGuess = currentGuess.slice(0, -1);
+          updateGrid();
+        } else if (/^[a-zA-Z]$/.test(e.key) && currentGuess.length < 5) {
+          currentGuess += e.key.toLowerCase();
+          updateGrid();
+        }
+      });
     }
 
     function celebrate() {
@@ -207,24 +217,21 @@
       currentGuess = "";
     }
 
-    document.addEventListener("keydown", (e) => {
-      if (currentRow >= 6) return;
-      if (e.key === "Enter" && currentGuess.length === 5) {
-        checkGuess();
-      } else if (e.key === "Backspace") {
-        currentGuess = currentGuess.slice(0, -1);
-        updateGrid();
-      } else if (/^[a-zA-Z]$/.test(e.key) && currentGuess.length < 5) {
-        currentGuess += e.key.toLowerCase();
-        updateGrid();
-      }
-    });
-
     resetBtn.addEventListener("click", () => {
       currentRow = 0;
       currentGuess = "";
       message.textContent = "";
       createGrid();
+    });
+
+    // For mobile: allow pressing enter key in soft keyboard
+    mobileInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && currentGuess.length === 5) {
+        checkGuess();
+      } else if (e.key === "Backspace") {
+        currentGuess = currentGuess.slice(0, -1);
+        updateGrid();
+      }
     });
 
     createGrid();
