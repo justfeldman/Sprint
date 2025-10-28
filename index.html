@@ -11,40 +11,43 @@
       color: #f5f5f5;
       font-family: 'Creepster', cursive;
       text-align: center;
-      padding: 20px;
+      padding: 15px;
+      margin: 0;
     }
 
     .title {
-      font-size: 3em;
+      font-size: 2.2em;
       color: orange;
       text-shadow: 2px 2px black;
-      margin-bottom: 10px;
+      margin: 5px 0 10px 0;
     }
 
     .subtitle {
-      font-size: 1.2em;
+      font-size: 1em;
       color: #bbb;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
+      padding: 0 10px;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(5, 60px);
-      grid-gap: 10px;
+      grid-template-columns: repeat(5, 55px);
+      grid-gap: 8px;
       justify-content: center;
-      margin: 20px auto;
+      margin: 10px auto 15px auto;
     }
 
     .grid div {
-      width: 60px;
-      height: 60px;
+      width: 55px;
+      height: 55px;
       border: 2px solid #444;
-      font-size: 2em;
-      line-height: 60px;
+      font-size: 1.8em;
+      line-height: 55px;
       background-color: #222;
       color: white;
       text-transform: uppercase;
       transition: transform 0.2s;
+      border-radius: 6px;
     }
 
     .grid div.reveal {
@@ -52,11 +55,11 @@
     }
 
     .correct {
-      background-color: #32cd32; /* green for “compliant” */
+      background-color: #32cd32;
     }
 
     .present {
-      background-color: orange; /* present but misfiled */
+      background-color: orange;
     }
 
     .absent {
@@ -64,20 +67,20 @@
     }
 
     #reset {
-      padding: 10px 20px;
-      font-size: 1.2em;
+      padding: 10px 18px;
+      font-size: 1em;
       background-color: orange;
       border: none;
       cursor: pointer;
-      margin-top: 20px;
-      border-radius: 5px;
+      margin-top: 15px;
+      border-radius: 6px;
     }
 
     #message {
-      font-size: 1.5em;
-      margin-top: 20px;
+      font-size: 1.3em;
+      margin-top: 15px;
       color: orange;
-      min-height: 40px;
+      min-height: 30px;
     }
 
     @keyframes confetti {
@@ -95,7 +98,6 @@
       z-index: 999;
     }
 
-    /* mobile responsive */
     @media (max-width: 600px) {
       .grid div {
         width: 45px;
@@ -103,9 +105,14 @@
         font-size: 1.5em;
         line-height: 45px;
       }
+      .grid {
+        grid-template-columns: repeat(5, 45px);
+        grid-gap: 6px;
+      }
+      .title { font-size: 2em; }
+      .subtitle { font-size: 0.9em; }
     }
 
-    /* hidden input for mobile typing */
     #mobileInput {
       position: absolute;
       opacity: 0;
@@ -124,8 +131,7 @@
   </div>
 
   <script>
-    const words = ["taxes", "globe", "pillar", "oecd", "audit", "levy"];
-    let answer = words[Math.floor(Math.random() * words.length)];
+    const answer = "taxes"; // fixed word for now
     const grid = document.getElementById("grid");
     const resetBtn = document.getElementById("reset");
     const message = document.getElementById("message");
@@ -151,19 +157,16 @@
     }
 
     function focusInput(cell) {
-      mobileInput.style.top = cell.getBoundingClientRect().top + "px";
-      mobileInput.style.left = cell.getBoundingClientRect().left + "px";
       mobileInput.focus();
-
       mobileInput.oninput = (e) => {
         const val = e.target.value.toLowerCase();
+        e.target.value = "";
         if (/^[a-z]$/.test(val)) {
           if (currentGuess.length < 5) {
             currentGuess += val;
             updateGrid();
           }
         }
-        e.target.value = "";
       };
     }
 
@@ -194,22 +197,10 @@
       }
 
       if (currentGuess === answer) {
-        const taxJokes = [
-          "🎉 GloBE compliant! No top-up tax owed!",
-          "🧾 Filing complete — Simon approves!",
-          "🍬 You’ve unlocked the Deferred Candy Credit!",
-          "🏆 Minimum tax achieved — maximum fun!",
-          "📊 OECD just sent you a thank-you letter!"
-        ];
-        message.textContent = taxJokes[Math.floor(Math.random() * taxJokes.length)];
+        message.textContent = "🎉 GloBE compliant! No top-up tax owed!";
         celebrate();
       } else if (currentRow === 5) {
-        const failJokes = [
-          `👻 Audit alert! The word was "${answer.toUpperCase()}"`,
-          `💀 Deferred until FY26... the word was "${answer.toUpperCase()}"`,
-          `🕸️ Top-up tax detected: "${answer.toUpperCase()}"`
-        ];
-        message.textContent = failJokes[Math.floor(Math.random() * failJokes.length)];
+        message.textContent = `👻 Audit alert! The word was "${answer.toUpperCase()}"`;
       }
 
       currentRow++;
@@ -230,7 +221,6 @@
     });
 
     resetBtn.addEventListener("click", () => {
-      answer = words[Math.floor(Math.random() * words.length)];
       currentRow = 0;
       currentGuess = "";
       message.textContent = "";
