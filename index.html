@@ -15,3 +15,116 @@
   <script src="script.js"></script>
 </body>
 </html>
+
+
+body {
+  background-color: #1c1c1c;
+  color: #f5f5f5;
+  font-family: 'Creepster', cursive;
+  text-align: center;
+  padding: 20px;
+}
+
+.title {
+  font-size: 3em;
+  color: orange;
+  text-shadow: 2px 2px black;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 60px);
+  grid-gap: 10px;
+  justify-content: center;
+  margin: 20px auto;
+}
+
+.grid div {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #444;
+  font-size: 2em;
+  line-height: 60px;
+  background-color: #222;
+  color: white;
+  text-transform: uppercase;
+}
+
+.correct {
+  background-color: green;
+}
+
+.present {
+  background-color: orange;
+}
+
+.absent {
+  background-color: #555;
+}
+
+#reset {
+  padding: 10px 20px;
+  font-size: 1.2em;
+  background-color: orange;
+  border: none;
+  cursor: pointer;
+}
+
+
+
+const words = ["ghost", "witch", "candy", "skull", "spook", "broom", "creep"];
+const answer = words[Math.floor(Math.random() * words.length)];
+const grid = document.getElementById("grid");
+const resetBtn = document.getElementById("reset");
+
+let currentRow = 0;
+let currentGuess = "";
+
+function createGrid() {
+  grid.innerHTML = "";
+  for (let i = 0; i < 30; i++) {
+    const cell = document.createElement("div");
+    grid.appendChild(cell);
+  }
+}
+
+function updateGrid() {
+  for (let i = 0; i < currentGuess.length; i++) {
+    const cell = grid.children[currentRow * 5 + i];
+    cell.textContent = currentGuess[i];
+  }
+}
+
+function checkGuess() {
+  for (let i = 0; i < 5; i++) {
+    const cell = grid.children[currentRow * 5 + i];
+    if (currentGuess[i] === answer[i]) {
+      cell.classList.add("correct");
+    } else if (answer.includes(currentGuess[i])) {
+      cell.classList.add("present");
+    } else {
+      cell.classList.add("absent");
+    }
+  }
+  currentRow++;
+  currentGuess = "";
+}
+
+document.addEventListener("keydown", (e) => {
+  if (currentRow >= 6) return;
+  if (e.key === "Enter" && currentGuess.length === 5) {
+    checkGuess();
+  } else if (e.key === "Backspace") {
+    currentGuess = currentGuess.slice(0, -1);
+    updateGrid();
+  } else if (/^[a-zA-Z]$/.test(e.key) && currentGuess.length < 5) {
+    currentGuess += e.key.toLowerCase();
+    updateGrid();
+  }
+});
+
+resetBtn.addEventListener("click", () => {
+  location.reload();
+});
+
+createGrid();
