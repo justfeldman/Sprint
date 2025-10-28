@@ -3,225 +3,127 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HLB Pillar Two Safe Harbour Dashboard</title>
+  <title>HLB Culture Sprint</title>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --hlb-blue: #00447C;
-      --hlb-dark: #002B5C;
-      --hlb-gold: #F2B90C;
-      --hlb-green: #2E8B57;
-      --hlb-red: #D9534F;
-      --light-grey: #F2F2F2;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Segoe UI', Calibri, sans-serif;
-      background-color: var(--hlb-blue);
-      color: #333;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-    }
-
-    .header {
-      background-color: var(--hlb-dark);
-      color: white;
-      padding: 15px;
+      background-color: #1c1c1c;
+      color: #f5f5f5;
+      font-family: 'Creepster', cursive;
       text-align: center;
-      font-size: 22px;
-      width: 100%;
-      letter-spacing: 0.4px;
+      padding: 20px;
     }
 
-    .subheader {
-      color: var(--hlb-gold);
-      font-size: 14px;
-      text-align: center;
-      margin: 4px 0 10px 0;
+    .title {
+      font-size: 3em;
+      color: orange;
+      text-shadow: 2px 2px black;
     }
 
-    .dashboard {
+    .grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      width: 90%;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .card {
-      background-color: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h2 {
-      margin-top: 0;
-      color: var(--hlb-blue);
-      border-bottom: 2px solid var(--hlb-gold);
-      padding-bottom: 5px;
-      font-size: 18px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    th {
-      background-color: var(--light-grey);
-      color: var(--hlb-blue);
-      text-align: left;
-      padding: 8px;
-      width: 40%;
-    }
-
-    td {
-      padding: 8px;
-      border-bottom: 1px solid #E6E6E6;
-    }
-
-    .tests {
-      text-align: left;
-      line-height: 1.8;
-      font-size: 14px;
-    }
-
-    .pass { color: var(--hlb-green); font-weight: bold; }
-    .fail { color: var(--hlb-red); font-weight: bold; }
-
-    .chart {
-      background-color: white;
-      border-radius: 10px;
+      grid-template-columns: repeat(5, 60px);
+      grid-gap: 10px;
+      justify-content: center;
       margin: 20px auto;
-      padding: 20px;
-      text-align: center;
-      width: 90%;
-      max-width: 1400px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .bar-container {
-      width: 80%;
-      margin: 0 auto;
-      background-color: #f0f0f0;
-      border-radius: 5px;
-      height: 25px;
-      position: relative;
-    }
-
-    .bar {
-      background-color: var(--hlb-green);
-      height: 25px;
-      width: 72%; /* ETR = 17.2% vs OECD 15% */
-      border-radius: 5px;
-    }
-
-    .benchmark {
-      position: absolute;
-      top: 0;
-      left: 63%;
-      width: 2px;
-      height: 25px;
-      background-color: var(--hlb-gold);
-    }
-
-    .footer {
-      text-align: center;
+    .grid div {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #444;
+      font-size: 2em;
+      line-height: 60px;
+      background-color: #222;
       color: white;
-      font-size: 12px;
-      margin-top: 10px;
-      padding-bottom: 10px;
-      width: 100%;
+      text-transform: uppercase;
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 1000px) {
-      .dashboard {
-        grid-template-columns: 1fr;
-      }
+    .correct {
+      background-color: green;
     }
 
+    .present {
+      background-color: orange;
+    }
+
+    .absent {
+      background-color: #555;
+    }
+
+    #reset {
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background-color: orange;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
-
-  <div class="header">
-    HLB Global Minimum Tax – Transitional Safe Harbour Dashboard
+  <div class="container">
+    <h1 class="title">HLB Culture Sprint</h1>
+    <div id="grid" class="grid"></div>
+    <button id="reset">Play Again</button>
   </div>
-  <div class="subheader">
-    Automated OECD Pillar Two Transitional CBC Reporting Safe Harbour Tool
-  </div>
+  <script>
+    const words = ["ghost", "witch", "candy", "skull", "spook", "broom", "creep"];
+    const answer = words[Math.floor(Math.random() * words.length)];
+    const grid = document.getElementById("grid");
+    const resetBtn = document.getElementById("reset");
 
-  <div class="dashboard">
-    <!-- Input Summary -->
-    <div class="card">
-      <h2>Input Summary</h2>
-      <table>
-        <tr><th>Jurisdiction</th><td>Germany 🇩🇪</td></tr>
-        <tr><th>Fiscal Year</th><td>2025</td></tr>
-        <tr><th>Entity Type</th><td>Ordinary Constituent Entity</td></tr>
-        <tr><th>Revenue (EUR)</th><td>800</td></tr>
-        <tr><th>GloBE Income (EUR)</th><td>365</td></tr>
-        <tr><th>Covered Taxes (EUR)</th><td>75</td></tr>
-        <tr><th>Payroll (EUR)</th><td>50</td></tr>
-        <tr><th>Tangible Assets (EUR)</th><td>1,050</td></tr>
-      </table>
-    </div>
+    let currentRow = 0;
+    let currentGuess = "";
 
-    <!-- Output Summary -->
-    <div class="card">
-      <h2>Output Summary</h2>
-      <table>
-        <tr><th>Transition Period</th><td>Yes</td></tr>
-        <tr><th>Eligible</th><td>Yes</td></tr>
-        <tr><th>Passed Test</th><td>Simplified ETR (17.2%)</td></tr>
-        <tr><th>Top-up Tax</th><td>0</td></tr>
-        <tr><th>Filing Obligations</th><td>GIR + IIR/UTPR + DMT (all 0)</td></tr>
-        <tr><th>Election Status</th><td>To be filed in Section 2 of GIR</td></tr>
-        <tr><th>Compliance Status</th><td class="pass">Compliant</td></tr>
-        <tr><th>Safe Harbour Applied</th><td class="pass">Transitional CBC</td></tr>
-      </table>
-    </div>
-  </div>
+    function createGrid() {
+      grid.innerHTML = "";
+      for (let i = 0; i < 30; i++) {
+        const cell = document.createElement("div");
+        grid.appendChild(cell);
+      }
+    }
 
-  <!-- Test Suite -->
-  <div class="card" style="width:90%; max-width:1400px; margin-top:20px;">
-    <h2>Safe Harbour Tests</h2>
-    <div class="tests">
-      🟢 <span class="pass">De Minimis Test</span> – Pass (&lt; €10m revenue and &lt; €1m income)<br>
-      🟢 <span class="pass">Simplified ETR Test</span> – Pass (17.2% ≥ 15%)<br>
-      🔴 <span class="fail">Routine Profits Test</span> – Fail (Income &gt; Routine Profit Threshold)<br><br>
-      <em>Jurisdictional Top-up Tax deemed to be 0 under Transitional CBC Safe Harbour.</em>
-    </div>
-  </div>
+    function updateGrid() {
+      for (let i = 0; i < currentGuess.length; i++) {
+        const cell = grid.children[currentRow * 5 + i];
+        cell.textContent = currentGuess[i];
+      }
+    }
 
-  <!-- Chart -->
-  <div class="chart">
-    <h2>ETR vs OECD 15% Threshold</h2>
-    <div class="bar-container">
-      <div class="bar"></div>
-      <div class="benchmark"></div>
-    </div>
-    <p style="font-size:13px; margin-top:8px;">
-      Green = Germany (17.2%) | Gold Line = OECD 15% Benchmark
-    </p>
-  </div>
+    function checkGuess() {
+      for (let i = 0; i < 5; i++) {
+        const cell = grid.children[currentRow * 5 + i];
+        if (currentGuess[i] === answer[i]) {
+          cell.classList.add("correct");
+        } else if (answer.includes(currentGuess[i])) {
+          cell.classList.add("present");
+        } else {
+          cell.classList.add("absent");
+        }
+      }
+      currentRow++;
+      currentGuess = "";
+    }
 
-  <div class="footer">
-    © 2025 HLB Global Advisory | Powered by Data + Expertise
-  </div>
+    document.addEventListener("keydown", (e) => {
+      if (currentRow >= 6) return;
+      if (e.key === "Enter" && currentGuess.length === 5) {
+        checkGuess();
+      } else if (e.key === "Backspace") {
+        currentGuess = currentGuess.slice(0, -1);
+        updateGrid();
+      } else if (/^[a-zA-Z]$/.test(e.key) && currentGuess.length < 5) {
+        currentGuess += e.key.toLowerCase();
+        updateGrid();
+      }
+    });
 
+    resetBtn.addEventListener("click", () => {
+      location.reload();
+    });
+
+    createGrid();
+  </script>
 </body>
 </html>
