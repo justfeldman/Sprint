@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HLB Pillar Two Safe Harbour Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Calibri, sans-serif;
+      background-color: #00447C;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #002B5C;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      letter-spacing: 0.5px;
+    }
+
+    .subheader {
+      color: #F2B90C;
+      font-size: 14px;
+      text-align: center;
+      margin-top: -8px;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 30px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #00447C;
+      border-bottom: 2px solid #F2B90C;
+      padding-bottom: 5px;
+      font-size: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #F2F2F2;
+      color: #00447C;
+      text-align: left;
+      padding: 8px;
+    }
+
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #E6E6E6;
+    }
+
+    .tests {
+      text-align: left;
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .pass { color: #2E8B57; font-weight: bold; }
+    .fail { color: #D9534F; font-weight: bold; }
+
+    .chart {
+      background-color: white;
+      border-radius: 10px;
+      margin: 0 30px 40px 30px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .bar-container {
+      width: 80%;
+      margin: 0 auto;
+      background-color: #f0f0f0;
+      border-radius: 5px;
+      height: 25px;
+      position: relative;
+    }
+
+    .bar {
+      background-color: #2E8B57;
+      height: 25px;
+      width: 72%; /* ETR = 17.2% vs OECD 15% benchmark */
+      border-radius: 5px;
+    }
+
+    .benchmark {
+      position: absolute;
+      top: 0;
+      left: 63%;
+      width: 2px;
+      height: 25px;
+      background-color: #F2B90C;
+    }
+
+    .footer {
+      text-align: center;
+      color: white;
+      font-size: 12px;
+      margin-top: 20px;
+      padding-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    HLB Global Minimum Tax – Transitional Safe Harbour Dashboard
+  </div>
+  <div class="subheader">
+    Automated OECD Pillar Two Transitional CBC Reporting Safe Harbour Tool
+  </div>
+
+  <div class="dashboard">
+    <!-- Left Panel -->
+    <div class="card">
+      <h2>Input Summary</h2>
+      <table>
+        <tr><th>Jurisdiction</th><td>Germany 🇩🇪</td></tr>
+        <tr><th>Fiscal Year</th><td>2025</td></tr>
+        <tr><th>Entity Type</th><td>Ordinary Constituent Entity</td></tr>
+        <tr><th>Revenue (EUR)</th><td>800</td></tr>
+        <tr><th>GloBE Income (EUR)</th><td>365</td></tr>
+        <tr><th>Covered Taxes (EUR)</th><td>75</td></tr>
+        <tr><th>Payroll (EUR)</th><td>50</td></tr>
+        <tr><th>Tangible Assets (EUR)</th><td>1,050</td></tr>
+      </table>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="card">
+      <h2>Output Summary</h2>
+      <table>
+        <tr><th>Transition Period</th><td>Yes</td></tr>
+        <tr><th>Eligible</th><td>Yes</td></tr>
+        <tr><th>Passed Test</th><td>Simplified ETR (17.2%)</td></tr>
+        <tr><th>Top-up Tax</th><td>0</td></tr>
+        <tr><th>Filing Obligations</th><td>GIR + IIR/UTPR + DMT (all 0)</td></tr>
+        <tr><th>Election Status</th><td>To be filed in Section 2 of GIR</td></tr>
+        <tr><th>Compliance Status</th><td class="pass">Compliant</td></tr>
+        <tr><th>Safe H
