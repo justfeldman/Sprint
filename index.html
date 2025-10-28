@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HLB Halloween Word Hunt 🎃</title>
+  <title>Pillar Two Panic 🎃</title>
   <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
   <style>
     body {
@@ -52,11 +52,11 @@
     }
 
     .correct {
-      background-color: #32cd32;
+      background-color: #32cd32; /* green for “compliant” */
     }
 
     .present {
-      background-color: orange;
+      background-color: orange; /* present but misfiled */
     }
 
     .absent {
@@ -89,10 +89,10 @@
       position: fixed;
       width: 10px;
       height: 10px;
-      background: orange;
       top: 0;
       left: 50%;
       animation: confetti 3s linear infinite;
+      z-index: 999;
     }
 
     @media (max-width: 600px) {
@@ -107,14 +107,15 @@
 </head>
 <body>
   <div class="container">
-    <h1 class="title">HLB Halloween Word Hunt</h1>
-    <p class="subtitle">Guess the spooky 5-letter word... if you dare 👻</p>
+    <h1 class="title">Pillar Two Panic 🧾</h1>
+    <p class="subtitle">Guess the spooky *tax* term... before the OECD calls 👻</p>
     <div id="grid" class="grid"></div>
     <div id="message"></div>
-    <button id="reset">Play Again</button>
+    <button id="reset">File Another Return</button>
   </div>
+
   <script>
-    const words = ["ghost", "witch", "candy", "skull", "spook", "broom", "creep", "haunt", "curse"];
+    const words = ["taxes", "globe", "pillar", "oecd", "audit", "levy"];
     let answer = words[Math.floor(Math.random() * words.length)];
     const grid = document.getElementById("grid");
     const resetBtn = document.getElementById("reset");
@@ -139,7 +140,7 @@
     }
 
     function celebrate() {
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 25; i++) {
         const conf = document.createElement("div");
         conf.className = "confetti";
         conf.style.left = Math.random() * 100 + "vw";
@@ -153,9 +154,10 @@
     function checkGuess() {
       for (let i = 0; i < 5; i++) {
         const cell = grid.children[currentRow * 5 + i];
-        if (currentGuess[i] === answer[i]) {
+        const letter = currentGuess[i];
+        if (letter === answer[i]) {
           cell.classList.add("correct");
-        } else if (answer.includes(currentGuess[i])) {
+        } else if (answer.includes(letter)) {
           cell.classList.add("present");
         } else {
           cell.classList.add("absent");
@@ -164,11 +166,22 @@
       }
 
       if (currentGuess === answer) {
-        message.textContent = "🎉 You cracked the spooky code!";
+        const taxJokes = [
+          "🎉 GloBE compliant! No top-up tax owed!",
+          "🧾 Filing complete — Simon approves!",
+          "🍬 You’ve unlocked the Deferred Candy Credit!",
+          "🏆 Minimum tax achieved — maximum fun!",
+          "📊 OECD just sent you a thank-you letter!"
+        ];
+        message.textContent = taxJokes[Math.floor(Math.random() * taxJokes.length)];
         celebrate();
-        setTimeout(() => alert("Office Challenge: First 3 winners get candy at reception 🍬"), 500);
       } else if (currentRow === 5) {
-        message.textContent = `👻 Boo! The word was "${answer.toUpperCase()}"`;
+        const failJokes = [
+          `👻 Audit alert! The word was "${answer.toUpperCase()}"`,
+          `💀 Deferred until FY26... the word was "${answer.toUpperCase()}"`,
+          `🕸️ Top-up tax detected: "${answer.toUpperCase()}"`
+        ];
+        message.textContent = failJokes[Math.floor(Math.random() * failJokes.length)];
       }
 
       currentRow++;
