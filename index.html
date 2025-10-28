@@ -95,6 +95,7 @@
       z-index: 999;
     }
 
+    /* mobile responsive */
     @media (max-width: 600px) {
       .grid div {
         width: 45px;
@@ -102,6 +103,13 @@
         font-size: 1.5em;
         line-height: 45px;
       }
+    }
+
+    /* hidden input for mobile typing */
+    #mobileInput {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -112,6 +120,7 @@
     <div id="grid" class="grid"></div>
     <div id="message"></div>
     <button id="reset">File Another Return</button>
+    <input id="mobileInput" type="text" maxlength="1" autocomplete="off" />
   </div>
 
   <script>
@@ -120,6 +129,7 @@
     const grid = document.getElementById("grid");
     const resetBtn = document.getElementById("reset");
     const message = document.getElementById("message");
+    const mobileInput = document.getElementById("mobileInput");
 
     let currentRow = 0;
     let currentGuess = "";
@@ -128,6 +138,7 @@
       grid.innerHTML = "";
       for (let i = 0; i < 30; i++) {
         const cell = document.createElement("div");
+        cell.addEventListener("click", () => focusInput(cell));
         grid.appendChild(cell);
       }
     }
@@ -137,6 +148,23 @@
         const cell = grid.children[currentRow * 5 + i];
         cell.textContent = currentGuess[i] || "";
       }
+    }
+
+    function focusInput(cell) {
+      mobileInput.style.top = cell.getBoundingClientRect().top + "px";
+      mobileInput.style.left = cell.getBoundingClientRect().left + "px";
+      mobileInput.focus();
+
+      mobileInput.oninput = (e) => {
+        const val = e.target.value.toLowerCase();
+        if (/^[a-z]$/.test(val)) {
+          if (currentGuess.length < 5) {
+            currentGuess += val;
+            updateGrid();
+          }
+        }
+        e.target.value = "";
+      };
     }
 
     function celebrate() {
