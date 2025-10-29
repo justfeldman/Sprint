@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pumpkin Competition | Team Upload & Voting</title>
+<style>
+  body {
+    background:#1c1c1c;
+    color:#f5f5f5;
+    font-family:Arial, sans-serif;
+    text-align:center;
+    padding:40px;
+  }
+  h1 {
+    color:orange;
+    font-size:2.5em;
+  }
+  input[type=file], input[type=text] {
+    margin:10px;
+    padding:10px;
+    border-radius:6px;
+    border:none;
+  }
+  button {
+    padding:10px 20px;
+    border:none;
+    background:orange;
+    color:white;
+    font-weight:bold;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  button:hover {
+    background:#e67e22;
+  }
+  .gallery {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-top:30px;
+  }
+  .pumpkin {
+    background:#333;
+    border-radius:10px;
+    margin:10px;
+    padding:10px;
+    width:180px;
+  }
+  .pumpkin img {
+    width:100%;
+    border-radius:10px;
+  }
+  .votes {
+    margin-top:10px;
+  }
+  .winner {
+    background:#ffb347;
+    color:black;
+    border-radius:10px;
+    padding:15px;
+    margin-top:30px;
+    display:inline-block;
+  }
+  a {
+    display:block;
+    margin-top:25px;
+    color:orange;
+    text-decoration:none;
+  }
+  a:hover {
+    text-decoration:underline;
+  }
+</style>
+</head>
+<body>
+  <h1>🎃 Pumpkin Competition</h1>
+  <p>Upload a photo and your team number once you’re done. We’ll display all pumpkins below — everyone can vote, and the winner will be revealed!</p>
+
+  <input type="file" id="upload" accept="image/*">
+  <input type="text" id="teamNumber" placeholder="Enter Team Number">
+  <button id="submitBtn">Submit Pumpkin</button>
+
+  <div class="gallery" id="gallery"></div>
+  <div id="winner" class="winner" style="display:none;"></div>
+
+  <button onclick="showWinner()">Show Winner 🏆</button>
+  <a href="index.html">⬅ Back to Main Menu</a>
+
+  <script>
+    const uploadInput = document.getElementById('upload');
+    const teamInput = document.getElementById('teamNumber');
+    const submitBtn = document.getElementById('submitBtn');
+    const gallery = document.getElementById('gallery');
+    const winnerDiv = document.getElementById('winner');
+
+    let pumpkins = JSON.parse(localStorage.getItem('pumpkins')) || [];
+
+    function renderGallery() {
+      gallery.innerHTML = '';
+      pumpkins.forEach((pumpkin, index) => {
+        const div = document.createElement('div');
+        div.className = 'pumpkin';
+        div.innerHTML = `
+          <img src="${pumpkin.src}" alt="Pumpkin ${index+1}">
+          <div>Team: ${pumpkin.team}</div>
+          <div class="votes">Votes: <span id="votes-${index}">${pumpkin.votes}</span></div>
+          <button onclick="vote(${index})">Vote 🎃</button>
+        `;
+        gallery.appendChild(div);
+      });
+    }
+
+    function vote(index) {
+      pumpkins[index].votes++;
+      localStorage.setItem('pumpkins', JSON.stringify(pumpkins));
+      renderGallery();
+    }
+
+    function showWinner() {
+      if (pumpkins.length === 0) {
+        alert('No pumpkins uploaded yet!');
+        return;
+      }
+      const maxVotes = Math.max(...pumpkins.map(p => p.votes));
+      const winners = pumpkins.filter(p => p.votes === maxVotes);
+      winnerDiv.style.display = 'block';
+      winnerDiv.innerHTML = `🏆 Winner: Team ${winners.map(w => w.team).join(', ')} with ${maxVotes} votes!`;
+    }
+
+    submitBtn.addEventListener('click', () => {
+      const file = uploadInput.files[0];
+      const team = teamInput.value.trim();
+      if (!file || !team) return alert('Please upload a photo and enter your team number!');
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const newPumpkin = { src: e.target.result, team: team, votes: 0 };
+        pumpkins.push(newPumpkin);
+        localStorage.setItem('pumpkins', JSON.stringify(pumpkins));
+        renderGallery();
+        alert('Pumpkin submitted successfully! 🎃');
+        uploadInput.value = '';
+        teamInput.value = '';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    renderGallery();
+  </script>
+</body>
+</html>
