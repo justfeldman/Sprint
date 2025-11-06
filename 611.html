@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P2 Engine | Matrix Calc</title>
+<style>
+  body {
+    background-color:#000;
+    color:#00ff99;
+    font-family:'Consolas',monospace;
+    margin:0; padding:0;
+  }
+  header {
+    text-align:center; padding:20px 0;
+    border-bottom:1px solid #00ff99;
+  }
+  h1 {font-size:28px; letter-spacing:2px;}
+  .container {
+    display:flex; flex-wrap:wrap;
+    justify-content:center; gap:40px;
+    padding:30px;
+  }
+  .panel {
+    background:rgba(0,20,0,0.9);
+    border:1px solid #00ff99;
+    border-radius:8px;
+    padding:20px; width:320px;
+    box-shadow:0 0 10px #00ff99;
+  }
+  label {display:block; margin-top:10px;}
+  input {
+    width:100%; padding:6px;
+    background:#001a00; color:#00ff99;
+    border:1px solid #00ff99; border-radius:4px;
+    font-family:'Consolas',monospace;
+  }
+  .result {
+    font-size:18px; margin:10px 0;
+  }
+  .pass {color:#00ff99;}
+  .fail {color:#ff0040;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>P2 ENGINE // GLOBAL MINIMUM TAX SIMULATOR</h1>
+  <p>“Calculating GloBE ETR in real time…”</p>
+</header>
+
+<div class="container">
+  <div class="panel" id="inputs">
+    <h2>INPUT DATA</h2>
+    <label>Profit Before Tax</label><input id="pbt" type="number" value="2000000">
+    <label>Current Tax Expense</label><input id="currtax" type="number" value="250000">
+    <label>Deferred Tax Expense</label><input id="deftax" type="number" value="30000">
+    <label>CbCR Profit Before Tax</label><input id="cbcrpbt" type="number" value="2000000">
+    <label>CbCR Tax Paid</label><input id="cbcrtax" type="number" value="250000">
+  </div>
+
+  <div class="panel" id="results">
+    <h2>RESULTS</h2>
+    <div class="result">GloBE ETR: <span id="etr">0%</span></div>
+    <div class="result">Top-Up Tax: <span id="topup">$0</span></div>
+    <div class="result">Safe Harbour ETR: <span id="shet">0%</span></div>
+    <div class="result">Safe Harbour Result: <span id="safe" class="fail">-</span></div>
+  </div>
+</div>
+
+<script>
+function formatPct(x){return (x*100).toFixed(2)+'%';}
+function formatMoney(x){return '$'+x.toLocaleString();}
+
+function calc(){
+  const PBT=+pbt.value, CT=+currtax.value, DT=+deftax.value,
+        CPBT=+cbcrpbt.value, CTAX=+cbcrtax.value;
+  const ETR = PBT? (CT+DT)/PBT : 0;
+  const TopUp = ETR<0.15 ? (0.15-ETR)*PBT : 0;
+  const SHETR = CPBT? CTAX/CPBT : 0;
+  const Safe = SHETR>=0.15 ? '✅ Pass' : '❌ Fail';
+  etr.textContent = formatPct(ETR);
+  topup.textContent = formatMoney(TopUp);
+  shet.textContent = formatPct(SHETR);
+  safe.textContent = Safe;
+  safe.className = SHETR>=0.15 ? 'pass' : 'fail';
+}
+document.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
+calc();
+</script>
+
+</body>
+</html>
