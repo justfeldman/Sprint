@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VuLife Engine</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f8f4ff;
+        }
+
+        header {
+            background: #a56bff;
+            padding: 16px;
+            color: white;
+            font-size: 22px;
+            text-align: center;
+            letter-spacing: .5px;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100vw;
+            height: 40vh;
+            background: white;
+            border-bottom: 3px solid #a56bff;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            margin-top: 6px;
+            margin-bottom: 12px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        button {
+            width: 100%;
+            background: #a56bff;
+            border: none;
+            padding: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        #helpBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #000;
+            padding: 14px 20px;
+            font-size: 15px;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>VuLife Engine</header>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="container">
+
+        <!-- XP SECTION -->
+        <div class="section">
+            <h3>Daily XP</h3>
+            <p><strong>Total XP:</strong> <span id="xpTotal">0</span></p>
+            <button onclick="addXP(10)">+10 XP (Calories Logged)</button>
+            <button onclick="addXP(20)">+20 XP (Workout Done)</button>
+            <button onclick="addXP(15)">+15 XP (Journal)</button>
+            <button onclick="addXP(5)">+5 XP (Stretching)</button>
+        </div>
+
+        <!-- CALORIES -->
+        <div class="section">
+            <label>Calories Today</label>
+            <input id="calInput" type="number" placeholder="Enter calories...">
+            <button onclick="saveCalories()">Save Calories</button>
+            <p id="calSavedText"></p>
+        </div>
+
+        <!-- WORKOUT -->
+        <div class="section">
+            <label>Workout Completed?</label>
+            <button onclick="saveWorkout()">Mark Workout Complete</button>
+            <p id="workoutSavedText"></p>
+        </div>
+    </div>
+
+    <div id="helpBtn" onclick="alert('Help Guide Coming Soon!')">
+        Help
+    </div>
+
+    <script>
+        /* CANVAS */
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight * 0.4;
+
+        function drawCanvas() {
+            ctx.fillStyle = "#a56bff";
+            ctx.font = "40px Arial";
+            ctx.fillText("Welcome Vu!", 40, 80);
+
+            ctx.font = "20px Arial";
+            ctx.fillText("Your daily life game starts now.", 40, 130);
+        }
+        drawCanvas();
+
+        /* XP SYSTEM */
+        let totalXP = 0;
+
+        function addXP(amount) {
+            totalXP += amount;
+            document.getElementById("xpTotal").textContent = totalXP;
+        }
+
+        /* CALORIES */
+        function saveCalories() {
+            const cal = document.getElementById("calInput").value;
+            document.getElementById("calSavedText").textContent =
+                "Calories saved: " + cal;
+            addXP(10);  // auto XP
+        }
+
+        /* WORKOUT */
+        function saveWorkout() {
+            document.getElementById("workoutSavedText").textContent =
+                "Workout logged!";
+            addXP(20);
+        }
+    </script>
+
+</body>
+</html>
