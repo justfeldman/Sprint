@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Interactive Map System</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f0f2f5;
+        display: flex;
+        height: 100vh;
+    }
+
+    /* Left side map */
+    #map {
+        flex: 2;
+        background: url('https://upload.wikimedia.org/wikipedia/commons/8/88/Australia_location_map_mini.svg')
+            no-repeat center center;
+        background-size: contain;
+        position: relative;
+        cursor: pointer;
+    }
+
+    /* Clickable region example */
+    .region {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 123, 255, 0.6);
+        border: 2px solid white;
+        transition: 0.2s;
+    }
+
+    .region:hover {
+        background: rgba(0, 123, 255, 1);
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    /* Right-side backend panel */
+    #backend {
+        flex: 1;
+        background: white;
+        border-left: 3px solid #e1e1e1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #title {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    #output {
+        background: #f7f7f7;
+        padding: 15px;
+        border-radius: 10px;
+        min-height: 200px;
+        white-space: pre-wrap;
+        font-family: monospace;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        margin-top: 20px;
+        padding: 12px;
+        background: black;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        opacity: 0.85;
+    }
+</style>
+</head>
+<body>
+
+<!-- MAP -->
+<div id="map">
+    <!-- Sydney -->
+    <div class="region" id="sydney" style="top: 70%; left: 85%;" title="Sydney"></div>
+
+    <!-- Melbourne -->
+    <div class="region" id="melbourne" style="top: 82%; left: 78%;" title="Melbourne"></div>
+
+    <!-- Perth -->
+    <div class="region" id="perth" style="top: 75%; left: 20%;" title="Perth"></div>
+</div>
+
+<!-- BASIC BACKEND PANEL -->
+<div id="backend">
+    <div id="title">Backend Panel</div>
+    <div id="output">Click a region on the map to load backend data.</div>
+    <button onclick="simulateProcess()">Run Backend Process</button>
+</div>
+
+<script>
+// =======================
+// BACKEND SIMULATION LOGIC
+// =======================
+
+// Fake backend “database”
+const backendDB = {
+    sydney: {
+        city: "Sydney",
+        revenue: "$1,200,000",
+        clients: 56,
+        status: "High activity",
+        nextSteps: "Expand team, automate reporting"
+    },
+    melbourne: {
+        city: "Melbourne",
+        revenue: "$840,000",
+        clients: 34,
+        status: "Moderate activity",
+        nextSteps: "Improve onboarding pipeline"
+    },
+    perth: {
+        city: "Perth",
+        revenue: "$410,000",
+        clients: 19,
+        status: "Low activity",
+        nextSteps: "Increase marketing reach"
+    }
+};
+
+// When clicking a region, load backend data
+document.querySelectorAll('.region').forEach(region => {
+    region.addEventListener('click', () => {
+        const id = region.id;
+        const data = backendDB[id];
+
+        document.getElementById("title").innerText = data.city + " Backend";
+        
+        document.getElementById("output").innerText =
+`City: ${data.city}
+Revenue: ${data.revenue}
+Clients: ${data.clients}
+Status: ${data.status}
+Next Steps: ${data.nextSteps}`;
+    });
+});
+
+// Backend “engine” function
+function simulateProcess() {
+    document.getElementById("output").innerText +=
+        `\n\n[System] Running transformation...
+[System] ETL complete.
+[System] XML validated.
+[System] Output ready.`;
+}
+</script>
+
+</body>
+</html>
