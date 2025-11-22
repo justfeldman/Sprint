@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Zoo Day – Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0c5a3f;
+        overflow: hidden;
+    }
+
+    .screen {
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+    }
+    .active { display: block; }
+
+    /* ---------- MAP SCREEN ---------- */
+    #mapScreen {
+        background: #0c5a3f;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 12px 20px;
+    }
+
+    #appTitle {
+        margin-top: 6px;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    #mapBox {
+        margin-top: 10px;
+        width: 100%;
+        max-width: 480px;
+        flex: 1;
+        background: url('https://i.imgur.com/UIdZy0e.png') center/cover no-repeat;
+        border-radius: 20px;
+        border: 4px solid #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Example “clean” markers (few only) */
+    .map-marker {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #0c5a3f;
+        font-weight: bold;
+    }
+
+    /* Bottom buttons */
+    #mapButtons {
+        width: 100%;
+        max-width: 480px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .mainBtn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        border: none;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    #missionsBtn {
+        background: #ffffff;
+        color: #0c5a3f;
+    }
+
+    #kidsBtn {
+        background: #f7c948;
+        color: #4a3b00;
+    }
+
+    #toiletToggleBtn {
+        background: #0f8c6b;
+        color: #ffffff;
+        font-size: 15px;
+    }
+
+    #toiletPanel {
+        width: 100%;
+        max-width: 480px;
+        margin-top: 4px;
+        background: #e6f3ee;
+        color: #043225;
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 14px;
+        display: none;
+    }
+    #toiletPanel.visible { display: block; }
+
+    #toiletPanel h3 {
+        margin: 0 0 4px 0;
+        font-size: 16px;
+    }
+
+    /* ---------- MISSIONS SCREEN ---------- */
+    #missionsScreen {
+        background: #e6f3ee;
+        padding: 16px;
+    }
+
+    .backBtn {
+        font-size: 16px;
+        background: #0c5a3f;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        cursor: pointer;
+        margin-bottom: 16px;
+    }
+
+    #missionCard {
+        background: #fff;
+        border-radius: 20px;
+        padding: 18px;
+        border: 3px solid #0c5a3f;
+        max-width: 480px;
+        margin: 0 auto 16px;
+    }
+
+    #missionTitle {
+        font-size: 24px;
+        font-weight: bold;
+        color: #0c5a3f;
+    }
+
+    #missionImg {
+        width: 100%;
+        height: 180px;
+        background: url('https://i.imgur.com/9E2sP8C.png') center/contain no-repeat;
+        border-radius: 18px;
+        margin: 14px 0;
+    }
+
+    .stars {
+        margin: 4px 0 10px;
+        color: gold;
+        font-size: 22px;
+    }
+
+    #missionDesc {
+        font-size: 16px;
+        line-height: 1.4;
+    }
+
+    #managerPanel {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 14px;
+        border: 2px dashed #0c5a3f;
+        max-width: 480px;
+        margin: 0 auto;
+        font-size: 15px;
+    }
+
+    #managerPanel h3 {
+        margin-top: 0;
+        font-size: 18px;
+        color: #0c5a3f;
+    }
+
+    #managerPanel ul {
+        padding-left: 18px;
+        margin: 6px 0 0;
+    }
+
+    /* ---------- KIDS GAME SCREEN ---------- */
+    #kidsScreen {
+        background: #fdf6e3;
+        padding: 16px;
+    }
+
+    #kidsTitle {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    #challengeCard {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 18px;
+        border: 3px solid #f7c948;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    #animalName {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+
+    #questionText {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .answerBtn {
+        width: 100%;
+        padding: 10px;
+        margin: 4px 0;
+        border-radius: 10px;
+        border: none;
+        font-size: 15px;
+        cursor: pointer;
+        background: #eee;
+    }
+
+    .answerBtn:hover {
+        background: #e0e0e0;
+    }
+
+    #feedback {
+        margin-top: 10px;
+        font-size: 15px;
+        min-height: 32px;
+    }
+
+    #nextChallengeBtn {
+        margin-top: 10px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: none;
+        background: #0c5a3f;
+        color: #fff;
+        cursor: pointer;
+        font-size: 15px;
+    }
+</style>
+</head>
+<body>
+
+<!-- ========== MAP SCREEN ========== -->
+<div id="mapScreen" class="screen active">
+    <div id="appTitle">Smart Zoo Day</div>
+
+    <div id="mapBox">
+        <!-- Minimal sample markers: K = Kangaroo, T = Toilet -->
+        <div class="map-marker" style="top: 55%; left: 40%;">K</div>
+        <div class="map-marker" style="top: 30%; left: 65%;">L</div>
+        <div class="map-marker" style="top: 75%; left: 20%;">T</div>
+    </div>
+
+    <div id="mapButtons">
+        <button id="missionsBtn" class="mainBtn">Zoo Missions (Demo)</button>
+        <button id="kidsBtn" class="mainBtn">Kids Game – Learn About Animals</button>
+        <button id="toiletToggleBtn" class="mainBtn">Show Toilets & Parents Info</button>
+    </div>
+
+    <div id="toiletPanel">
+        <h3>Toilets & Change Tables</h3>
+        <ul>
+            <li>Main Entrance Block – closest to car park</li>
+            <li>Kangaroo Walk-Through – family toilets + change table</li>
+            <li>Playground Zone – pram-friendly access</li>
+        </ul>
+        <p style="margin-top:6px;">
+            Our smart route planner can always keep you within a few minutes of
+            the nearest toilet or change table. Parents actually use this – it’s a
+            real value feature, not just a map icon.
+        </p>
+    </div>
+</div>
+
+
+<!-- ========== MISSIONS SCREEN ========== -->
+<div id="missionsScreen" class="screen">
+    <button class="backBtn backToMap">← Back to Map</button>
+
+    <div id="missionCard">
+        <div id="missionTitle">Kangaroo Mission</div>
+        <div id="missionImg"></div>
+        <div class="stars">⭐⭐⭐</div>
+        <div id="missionDesc">
+            Help the <b>Ranger Team</b> understand how kangaroos are coping
+            with changing seasons.
+            <br><br>
+            <b>Your mission:</b> notice where the kangaroos rest, where they
+            feed, and how much shade they have. Kids can log what they see in
+            three simple steps:
+            <ol>
+                <li>Count how many kangaroos you can spot.</li>
+                <li>Circle on the map where you saw them resting.</li>
+                <li>Pick one “challenge” they might face (heat, drought, cars).</li>
+            </ol>
+            This turns a normal walk into a mini-field study – easy to run,
+            fun for kids, and full of data the zoo can actually use.
+        </div>
+    </div>
+
+    <div id="managerPanel">
+        <h3>For Zoo Management (Consulting Layer)</h3>
+        <p>
+            Behind the scenes, this mission feeds a simple data model:
+        </p>
+        <ul>
+            <li>Heat-stress risk zones along the route.</li>
+            <li>Visitor attention hotspots (where families actually stop).</li>
+            <li>Animal “challenge” tags chosen by visitors.</li>
+        </ul>
+        <p style="margin-top:6px;">
+            We use this to build dashboards that show:
+        </p>
+        <ul>
+            <li>Which animals kids care about most.</li>
+            <li>Where to invest in shade, signage, or experiences.</li>
+            <li>How missions drive time-on-site and revenue per visitor.</li>
+        </ul>
+        <p style="margin-top:6px;">
+            That’s the pitch: fun missions on the front-end, real operational and
+            revenue insight on the back-end.
+        </p>
+    </div>
+</div>
+
+
+<!-- ========== KIDS GAME SCREEN ========== -->
+<div id="kidsScreen" class="screen">
+    <button class="backBtn backToMap">← Back to Map</button>
+
+    <div id="kidsTitle">Animal Challenge Game</div>
+    <p style="max-width:480px;margin:0 auto 10px;">
+        Tap the best answer to learn what challenges animals face in the wild.
+        Simple, no glitches – just click and learn.
+    </p>
+
+    <div id="challengeCard">
+        <div id="animalName"></div>
+        <div id="questionText"></div>
+        <button class="answerBtn" data-index="0"></button>
+        <button class="answerBtn" data-index="1"></button>
+        <button class="answerBtn" data-index="2"></button>
+
+        <div id="feedback"></div>
+        <button id="nextChallengeBtn">Next Animal</button>
+    </div>
+</div>
+
+
+<script>
+    // ---------- SCREEN NAVIGATION ----------
+    const mapScreen    = document.getElementById('mapScreen');
+    const missionsScreen = document.getElementById('missionsScreen');
+    const kidsScreen   = document.getElementById('kidsScreen');
+
+    function showScreen(screen) {
+        [mapScreen, missionsScreen, kidsScreen].forEach(s => s.classList.remove('active'));
+        screen.classList.add('active');
+    }
+
+    document.getElementById('missionsBtn').onclick = () => showScreen(missionsScreen);
+    document.getElementById('kidsBtn').onclick     = () => showScreen(kidsScreen);
+
+    document.querySelectorAll('.backToMap').forEach(btn => {
+        btn.onclick = () => showScreen(mapScreen);
+    });
+
+    // ---------- TOILET PANEL TOGGLE ----------
+    const toiletPanel = document.getElementById('toiletPanel');
+    document.getElementById('toiletToggleBtn').onclick = () => {
+        toiletPanel.classList.toggle('visible');
+    };
+
+    // ---------- KIDS GAME LOGIC ----------
+    const challenges = [
+        {
+            animal: "Kangaroo",
+            question: "What is a real challenge kangaroos face?",
+            options: [
+                "Finding enough food and water during droughts",
+                "Learning how to fly",
+                "Remembering their Wi-Fi password"
+            ],
+            correct: 0,
+            explanation: "When there is less grass and water, kangaroos have to travel further and can get weaker."
+        },
+        {
+            animal: "Penguin",
+            question: "What problem can penguins have?",
+            options: [
+                "Too many ice creams",
+                "Water pollution and warming seas",
+                "Forgetting their homework"
+            ],
+            correct: 1,
+            explanation: "Pollution and warmer oceans can affect the fish they eat and the ice they live on."
+        },
+        {
+            animal: "Elephant",
+            question: "What challenge might elephants face?",
+            options: [
+                "Not enough hats",
+                "Habitat loss and needing lots of space",
+                "Too many birthday parties"
+            ],
+            correct: 1,
+            explanation: "Elephants need huge areas to walk and find food. When habitat is cleared, life gets harder."
+        }
+    ];
+
+    let currentIndex = 0;
+
+    const animalNameEl = document.getElementById('animalName');
+    const questionTextEl = document.getElementById('questionText');
+    const answerButtons = document.querySelectorAll('.answerBtn');
+    const feedbackEl = document.getElementById('feedback');
+
+    function loadChallenge(index) {
+        const ch = challenges[index];
+        animalNameEl.textContent = ch.animal;
+        questionTextEl.textContent = ch.question;
+        answerButtons.forEach((btn, i) => {
+            btn.textContent = ch.options[i];
+            btn.style.background = '#eee';
+        });
+        feedbackEl.textContent = "";
+    }
+
+    answerButtons.forEach(btn => {
+        btn.onclick = () => {
+            const choice = parseInt(btn.getAttribute('data-index'), 10);
+            const ch = challenges[currentIndex];
+
+            if (choice === ch.correct) {
+                feedbackEl.textContent = "✅ Correct! " + ch.explanation;
+                btn.style.background = '#c8e6c9';
+            } else {
+                feedbackEl.textContent = "❌ Not quite. Try another answer.";
+                btn.style.background = '#ffcdd2';
+            }
+        };
+    });
+
+    document.getElementById('nextChallengeBtn').onclick = () => {
+        currentIndex = (currentIndex + 1) % challenges.length;
+        loadChallenge(currentIndex);
+    };
+
+    // Initialize first challenge
+    loadChallenge(currentIndex);
+</script>
+
+</body>
+</html>
