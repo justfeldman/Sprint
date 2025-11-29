@@ -2,22 +2,34 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Write-Offs</title>
+<title>HLB Write-Offs</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fa; padding: 20px; }
+  body { 
+    font-family: Arial, sans-serif; 
+    margin: 0; 
+    background: #f5f7fa; 
+    padding: 20px; 
+  }
+
+  /* ===== HLB COLOURS ===== */
+  :root {
+    --hlb-blue: #0F4C81;
+    --hlb-light-blue: #4FC3F7;
+    --hlb-accent: #A1D884;
+  }
   
   /* ===== TOPBAR ===== */
   .topbar {
     display: flex;
     align-items: center;
-    background: #4fc3f7;
+    background: var(--hlb-blue);
     padding: 10px 20px;
     color: #fff;
     gap: 10px;
   }
   .topbar button {
     background: #fff;
-    color: #00796b;
+    color: var(--hlb-blue);
     border: none;
     border-radius: 6px;
     padding: 8px 14px;
@@ -29,30 +41,50 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.07);
   }
   .topbar button:hover { background: #e0f2f1; }
+  .active { background: var(--hlb-accent) !important; color: #fff !important; }
 
   /* ===== TABLE ===== */
-  table { border-collapse: collapse; width: 100%; margin-top: 20px; background: #fff; }
-  th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
-  th { background: #00796b; color: #fff; }
+  table { 
+    border-collapse: collapse; 
+    width: 100%; 
+    margin-top: 20px; 
+    background: #fff;
+  }
+  th, td { 
+    border: 1px solid #ccc; 
+    padding: 8px 12px; 
+    text-align: center; 
+  }
+  th { background: var(--hlb-blue); color: #fff; }
   input[type="number"] { width: 80px; padding: 4px; text-align: right; }
 
-  /* ===== SUBMIT BUTTON ===== */
+  /* ===== TOTAL BAR ===== */
+  .summary-box {
+    margin-top: 15px;
+    background: var(--hlb-light-blue);
+    padding: 12px;
+    border-radius: 8px;
+    color: #00334d;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  /* ===== BUTTON ===== */
   .submit-btn {
     margin-top: 20px;
-    padding: 10px 20px;
+    padding: 12px 22px;
     font-size: 16px;
-    background: #00796b;
+    background: var(--hlb-blue);
     color: #fff;
     border: none;
     border-radius: 6px;
     cursor: pointer;
   }
-  .submit-btn:hover { background: #004d40; }
+  .submit-btn:hover { background: #082f52; }
 </style>
 </head>
 <body>
 
-<!-- ===== TOPBAR ===== -->
 <div class="topbar">
   <button onclick="window.location.href='timesheet3.html'">📝 Timesheet</button>
   <button onclick="window.location.href='fees.html'">💰 Fees</button>
@@ -61,49 +93,61 @@
 
 <h2>Client Write-Offs</h2>
 
+<div class="summary-box">
+  🎯 Total Write-Off Entered: <span id="totalWO">$0</span>
+</div>
+
 <table id="writeoffTable">
   <tr>
     <th>Client</th>
     <th>Fee Amount ($)</th>
     <th>Write-Off ($)</th>
   </tr>
-  <!-- Dummy client rows -->
-  <tr><td>ACME Corp</td><td>12,500</td><td><input type="number" min="0" value="0"></td></tr>
-  <tr><td>Beta LLC</td><td>8,200</td><td><input type="number" min="0" value="0"></td></tr>
-  <tr><td>Gamma Inc</td><td>15,300</td><td><input type="number" min="0" value="0"></td></tr>
-  <tr><td>Delta Co</td><td>6,700</td><td><input type="number" min="0" value="0"></td></tr>
-  <tr><td>Epsilon Ltd</td><td>9,800</td><td><input type="number" min="0" value="0"></td></tr>
-  <tr><td>Zeta Partners</td><td>14,100</td><td><input type="number" min="0" value="0"></td></tr>
-  <tr><td>Eta Group</td><td>7,500</td><td><input type="number" min="0" value="0"></td></tr>
-  <tr><td>Theta Enterprises</td><td>11,200</td><td><input type="number" min="0" value="0"></td></tr>
-  <tr><td>Iota Solutions</td><td>5,900</td><td><input type="number" min="0" value="0"></td></tr>
-  <tr><td>Kappa Consulting</td><td>10,400</td><td><input type="number" min="0" value="0"></td></tr>
+
+  <!-- Dummy rows -->
+  <tr><td>ACME Corp</td><td data-fee="12500">$12,500</td><td><input type="number" min="0" value="0" oninput="updateTotals()"></td></tr>
+  <tr><td>Beta LLC</td><td data-fee="8200">$8,200</td><td><input type="number" min="0" value="0" oninput="updateTotals()"></td></tr>
+  <tr><td>Gamma Inc</td><td data-fee="15300">$15,300</td><td><input type="number" min="0" value="0" oninput="updateTotals()"></td></tr>
+  <tr><td>Delta Co</td><td data-fee="6700">$6,700</td><td><input type="number" min="0" value="0" oninput="updateTotals()"></td></tr>
 </table>
 
 <button class="submit-btn" onclick="submitWriteOffs()">Submit Write-Offs</button>
 
 <script>
+function updateTotals() {
+  const inputs = document.querySelectorAll('input[type="number"]');
+  let total = 0;
+  inputs.forEach(i => total += Number(i.value || 0));
+  document.getElementById('totalWO').textContent = "$" + total.toLocaleString();
+}
+
 function submitWriteOffs() {
-  const table = document.getElementById('writeoffTable');
-  const rows = table.querySelectorAll('tr');
+  const rows = document.querySelectorAll('#writeoffTable tr');
   const results = [];
-  
-  for (let i = 1; i < rows.length; i++) { // skip header
+
+  for (let i = 1; i < rows.length; i++) {
     const client = rows[i].cells[0].textContent;
-    const fee = rows[i].cells[1].textContent;
+    const fee = rows[i].cells[1].dataset.fee;
     const writeoff = rows[i].cells[2].querySelector('input').value;
-    
-    if (writeoff && writeoff != '0') {
-      results.push({ client, fee, writeoff });
+
+    if (writeoff > 0) {
+      results.push({
+        clientName: client,
+        apsClientID: "TBD",
+        originalFee: Number(fee),
+        writeOff: Number(writeoff),
+        percent: Number(writeoff) / Number(fee)
+      });
     }
   }
-  
+
   if (results.length === 0) {
     alert("No write-offs entered.");
-  } else {
-    console.log("Write-Offs Submitted:", results);
-    alert("Write-offs submitted! Check console for details.");
+    return;
   }
+
+  console.log("Final JSON payload:", results);
+  alert("Write-offs submitted! (Payload in console)");
 }
 </script>
 
