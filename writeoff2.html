@@ -1,0 +1,188 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HLB Write-Off Engine</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f7f9fb;
+    padding: 30px;
+    margin: 0;
+    color: #333;
+  }
+
+  .topbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .topbar button {
+    background: #4fc3f7;
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .topbar button:hover {
+    background: #47b0df;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  th {
+    background: #e3f2fd;
+    text-align: left;
+    padding: 14px;
+    font-size: 15px;
+  }
+
+  td {
+    padding: 12px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  input[type="number"]:focus {
+    outline: none;
+    border-color: #4fc3f7;
+    box-shadow: 0 0 3px rgba(79,195,247,0.5);
+  }
+
+  .submit-btn {
+    margin-top: 20px;
+    background: #00796b;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .submit-btn:hover {
+    background: #006558;
+  }
+
+  .section {
+    margin-top: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <button>📝 Timesheet</button>
+  <button>💰 Fees</button>
+  <button>✏️ Write-Offs</button>
+</div>
+
+<h1>HLB Client Write-Offs</h1>
+
+<table id="wipTable">
+  <tr>
+    <th>Client Name</th>
+    <th>WIP Amount ($)</th>
+    <th>Fee Input ($)</th>
+    <th>Write-Off Input ($)</th>
+  </tr>
+
+  <tr>
+    <td>ACME Corp</td>
+    <td>12500</td>
+    <td><input type="number" min="0"></td>
+    <td><input type="number" min="0"></td>
+  </tr>
+
+  <tr>
+    <td>Beta LLC</td>
+    <td>8200</td>
+    <td><input type="number" min="0"></td>
+    <td><input type="number" min="0"></td>
+  </tr>
+
+  <tr>
+    <td>Gamma Inc</td>
+    <td>15300</td>
+    <td><input type="number" min="0"></td>
+    <td><input type="number" min="0"></td>
+  </tr>
+
+  <tr>
+    <td>Delta Co</td>
+    <td>6700</td>
+    <td><input type="number" min="0"></td>
+    <td><input type="number" min="0"></td>
+  </tr>
+</table>
+
+<button class="submit-btn" onclick="submitWriteOffs()">Submit Write-Offs</button>
+
+<!-- Hours Saved Section -->
+<div class="section">
+  <h2>⏱ Efficiency Impact</h2>
+  <p><strong>Manual process time per client:</strong></p>
+
+  <select id="manualSelect" onchange="calculateHoursSaved()">
+    <option value="2">2 minutes</option>
+    <option value="3" selected>3 minutes</option>
+    <option value="5">5 minutes</option>
+  </select>
+
+  <p id="hoursSaved" style="font-size:18px; margin-top:10px; font-weight:600;"></p>
+</div>
+
+<script>
+  function calculateHoursSaved() {
+    const manual = Number(document.getElementById("manualSelect").value);
+    const automated = 0.5; // 30 seconds per client
+
+    let rows = document.querySelectorAll("#wipTable tr");
+    let clientCount = rows.length - 1; // remove header row
+
+    let totalSaved = (manual - automated) * clientCount; // minutes
+    let hours = (totalSaved / 60).toFixed(2);
+
+    document.getElementById("hoursSaved").innerText =
+      `Estimated Hours Saved per Cycle: ${hours} hours`;
+  }
+
+  calculateHoursSaved();
+
+  function submitWriteOffs() {
+    alert("Write-Offs submitted successfully.");
+  }
+</script>
+
+</body>
+</html>
