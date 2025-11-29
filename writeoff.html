@@ -11,7 +11,6 @@
     padding: 20px; 
   }
 
-  /* ===== HLB COLOURS ===== */
   :root {
     --hlb-blue: #0F4C81;
     --hlb-light-blue: #4FC3F7;
@@ -37,28 +36,16 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
   }
-  .topbar button:hover { background: #e0f2f1; }
   .active { background: var(--hlb-accent) !important; color: #fff !important; }
 
   /* ===== TABLE ===== */
-  table { 
-    border-collapse: collapse; 
-    width: 100%; 
-    margin-top: 20px; 
-    background: #fff;
-  }
-  th, td { 
-    border: 1px solid #ccc; 
-    padding: 8px 12px; 
-    text-align: center; 
-  }
+  table { border-collapse: collapse; width: 100%; margin-top: 20px; background: #fff; }
+  th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
   th { background: var(--hlb-blue); color: #fff; }
-  input[type="number"] { width: 80px; padding: 4px; text-align: right; }
+  input[type="number"] { width: 100px; padding: 4px; text-align: right; }
 
-  /* ===== TOTAL BAR ===== */
+  /* ===== SUMMARY ===== */
   .summary-box {
     margin-top: 15px;
     background: var(--hlb-light-blue);
@@ -80,7 +67,6 @@
     border-radius: 6px;
     cursor: pointer;
   }
-  .submit-btn:hover { background: #082f52; }
 </style>
 </head>
 <body>
@@ -99,26 +85,54 @@
 
 <table id="writeoffTable">
   <tr>
-    <th>Client</th>
-    <th>Fee Amount ($)</th>
-    <th>Write-Off ($)</th>
+    <th>WIP Code</th>
+    <th>Fee Input ($)</th>
+    <th>Write-Off Input ($)</th>
   </tr>
 
-  <!-- Dummy rows -->
-  <tr><td>ACME Corp</td><td data-fee="12500">$12,500</td><td><input type="number" min="0" value="0" oninput="updateTotals()"></td></tr>
-  <tr><td>Beta LLC</td><td data-fee="8200">$8,200</td><td><input type="number" min="0" value="0" oninput="updateTotals()"></td></tr>
-  <tr><td>Gamma Inc</td><td data-fee="15300">$15,300</td><td><input type="number" min="0" value="0" oninput="updateTotals()"></td></tr>
-  <tr><td>Delta Co</td><td data-fee="6700">$6,700</td><td><input type="number" min="0" value="0" oninput="updateTotals()"></td></tr>
+  <!-- Dummy APS-style rows -->
+  <tr>
+    <td>WIP-87321</td>
+    <td><input type="number" value="12500" min="0" oninput="updateTotals()"></td>
+    <td><input type="number" value="0" min="0" oninput="updateTotals()"></td>
+  </tr>
+
+  <tr>
+    <td>WIP-99214</td>
+    <td><input type="number" value="8200" min="0" oninput="updateTotals()"></td>
+    <td><input type="number" value="0" min="0" oninput="updateTotals()"></td>
+  </tr>
+
+  <tr>
+    <td>WIP-55109</td>
+    <td><input type="number" value="15300" min="0" oninput="updateTotals()"></td>
+    <td><input type="number" value="0" min="0" oninput="updateTotals()"></td>
+  </tr>
+
+  <tr>
+    <td>WIP-44387</td>
+    <td><input type="number" value="6700" min="0" oninput="updateTotals()"></td>
+    <td><input type="number" value="0" min="0" oninput="updateTotals()"></td>
+  </tr>
+
 </table>
 
 <button class="submit-btn" onclick="submitWriteOffs()">Submit Write-Offs</button>
 
 <script>
 function updateTotals() {
-  const inputs = document.querySelectorAll('input[type="number"]');
+  const table = document.getElementById('writeoffTable');
+  const rows = table.querySelectorAll('tr');
   let total = 0;
-  inputs.forEach(i => total += Number(i.value || 0));
-  document.getElementById('totalWO').textContent = "$" + total.toLocaleString();
+
+  // Loop each row, read write-off value
+  for (let i = 1; i < rows.length; i++) {
+    const writeOff = Number(rows[i].cells[2].querySelector('input').value || 0);
+    total += writeOff;
+  }
+
+  document.getElementById('totalWO').textContent = 
+    "$" + total.toLocaleString();
 }
 
 function submitWriteOffs() {
@@ -126,17 +140,16 @@ function submitWriteOffs() {
   const results = [];
 
   for (let i = 1; i < rows.length; i++) {
-    const client = rows[i].cells[0].textContent;
-    const fee = rows[i].cells[1].dataset.fee;
-    const writeoff = rows[i].cells[2].querySelector('input').value;
+    const wip = rows[i].cells[0].textContent;
+    const fee = Number(rows[i].cells[1].querySelector('input').value);
+    const writeoff = Number(rows[i].cells[2].querySelector('input').value);
 
     if (writeoff > 0) {
       results.push({
-        clientName: client,
-        apsClientID: "TBD",
-        originalFee: Number(fee),
-        writeOff: Number(writeoff),
-        percent: Number(writeoff) / Number(fee)
+        wipCode: wip,
+        feeAmount: fee,
+        writeOffAmount: writeoff,
+        percent: (writeoff / fee)
       });
     }
   }
@@ -146,8 +159,8 @@ function submitWriteOffs() {
     return;
   }
 
-  console.log("Final JSON payload:", results);
-  alert("Write-offs submitted! (Payload in console)");
+  console.log("JSON payload for backend:", results);
+  alert("Write-offs submitted! (Open console to view payload)");
 }
 </script>
 
