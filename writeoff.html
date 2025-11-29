@@ -34,26 +34,27 @@
     padding: 8px 14px;
     font-size: 16px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
   }
   .active { background: var(--hlb-accent) !important; color: #fff !important; }
 
   /* ===== TABLE ===== */
-  table { border-collapse: collapse; width: 100%; margin-top: 20px; background: #fff; }
-  th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
+  table { 
+    border-collapse: collapse; 
+    width: 100%; 
+    margin-top: 20px; 
+    background: #fff; 
+  }
+  th, td { 
+    border: 1px solid #ccc; 
+    padding: 8px 12px; 
+    text-align: center; 
+  }
   th { background: var(--hlb-blue); color: #fff; }
-  input[type="number"] { width: 100px; padding: 4px; text-align: right; }
 
-  /* ===== SUMMARY ===== */
-  .summary-box {
-    margin-top: 15px;
-    background: var(--hlb-light-blue);
-    padding: 12px;
-    border-radius: 8px;
-    color: #00334d;
-    font-size: 16px;
-    font-weight: bold;
+  input[type="number"] {
+    width: 110px; 
+    padding: 4px; 
+    text-align: right;
   }
 
   /* ===== BUTTON ===== */
@@ -79,88 +80,69 @@
 
 <h2>Client Write-Offs</h2>
 
-<div class="summary-box">
-  🎯 Total Write-Off Entered: <span id="totalWO">$0</span>
-</div>
-
 <table id="writeoffTable">
   <tr>
-    <th>WIP Code</th>
+    <th>Client Name</th>
+    <th>WIP Amount ($)</th>
     <th>Fee Input ($)</th>
     <th>Write-Off Input ($)</th>
   </tr>
 
-  <!-- Dummy APS-style rows -->
+  <!-- ROWS (name → WIP dummy → fee input → writeoff input) -->
   <tr>
-    <td>WIP-87321</td>
-    <td><input type="number" value="12500" min="0" oninput="updateTotals()"></td>
-    <td><input type="number" value="0" min="0" oninput="updateTotals()"></td>
+    <td>ACME Corp</td>
+    <td data-wip="12500">$12,500</td>
+    <td><input type="number" min="0" placeholder="Enter Fee"></td>
+    <td><input type="number" min="0" placeholder="Enter Write-Off"></td>
   </tr>
 
   <tr>
-    <td>WIP-99214</td>
-    <td><input type="number" value="8200" min="0" oninput="updateTotals()"></td>
-    <td><input type="number" value="0" min="0" oninput="updateTotals()"></td>
+    <td>Beta LLC</td>
+    <td data-wip="8200">$8,200</td>
+    <td><input type="number" min="0" placeholder="Enter Fee"></td>
+    <td><input type="number" min="0" placeholder="Enter Write-Off"></td>
   </tr>
 
   <tr>
-    <td>WIP-55109</td>
-    <td><input type="number" value="15300" min="0" oninput="updateTotals()"></td>
-    <td><input type="number" value="0" min="0" oninput="updateTotals()"></td>
+    <td>Gamma Inc</td>
+    <td data-wip="15300">$15,300</td>
+    <td><input type="number" min="0" placeholder="Enter Fee"></td>
+    <td><input type="number" min="0" placeholder="Enter Write-Off"></td>
   </tr>
 
   <tr>
-    <td>WIP-44387</td>
-    <td><input type="number" value="6700" min="0" oninput="updateTotals()"></td>
-    <td><input type="number" value="0" min="0" oninput="updateTotals()"></td>
+    <td>Delta Co</td>
+    <td data-wip="6700">$6,700</td>
+    <td><input type="number" min="0" placeholder="Enter Fee"></td>
+    <td><input type="number" min="0" placeholder="Enter Write-Off"></td>
   </tr>
-
 </table>
 
 <button class="submit-btn" onclick="submitWriteOffs()">Submit Write-Offs</button>
 
 <script>
-function updateTotals() {
-  const table = document.getElementById('writeoffTable');
-  const rows = table.querySelectorAll('tr');
-  let total = 0;
-
-  // Loop each row, read write-off value
-  for (let i = 1; i < rows.length; i++) {
-    const writeOff = Number(rows[i].cells[2].querySelector('input').value || 0);
-    total += writeOff;
-  }
-
-  document.getElementById('totalWO').textContent = 
-    "$" + total.toLocaleString();
-}
-
 function submitWriteOffs() {
   const rows = document.querySelectorAll('#writeoffTable tr');
   const results = [];
 
   for (let i = 1; i < rows.length; i++) {
-    const wip = rows[i].cells[0].textContent;
-    const fee = Number(rows[i].cells[1].querySelector('input').value);
-    const writeoff = Number(rows[i].cells[2].querySelector('input').value);
+    const client = rows[i].cells[0].textContent;
+    const wip = Number(rows[i].cells[1].dataset.wip);
+    const fee = Number(rows[i].cells[2].querySelector('input').value);
+    const writeoff = Number(rows[i].cells[3].querySelector('input').value);
 
-    if (writeoff > 0) {
+    if (fee > 0 || writeoff > 0) {
       results.push({
-        wipCode: wip,
-        feeAmount: fee,
-        writeOffAmount: writeoff,
-        percent: (writeoff / fee)
+        clientName: client,
+        wipAmount: wip,
+        feeInput: fee,
+        writeOffInput: writeoff
       });
     }
   }
 
-  if (results.length === 0) {
-    alert("No write-offs entered.");
-    return;
-  }
-
-  console.log("JSON payload for backend:", results);
-  alert("Write-offs submitted! (Open console to view payload)");
+  console.log("JSON payload:", results);
+  alert("Submitted! Check console for output.");
 }
 </script>
 
