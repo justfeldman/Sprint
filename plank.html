@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plank</title>
+
+  <!-- iOS "app-like" -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --card: #151823;
+      --text: #e9ecf1;
+      --muted: #aab2c0;
+      --border: rgba(255,255,255,0.10);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap { max-width: 520px; margin: 0 auto; padding: 18px; }
+
+    .top h1 { margin: 6px 0 10px; font-size: 28px; }
+    .sub { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); }
+
+    .tabs {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .tab {
+      padding: 12px 10px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tab.active { color: var(--text); background: rgba(255,255,255,0.06); }
+
+    .panel { display: none; margin-top: 16px; }
+    .panel.active { display: block; }
+
+    .timer {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 26px 16px;
+      text-align: center;
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      user-select: none;
+    }
+
+    .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .btn {
+      padding: 14px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn:disabled { opacity: 0.45; cursor: default; }
+    .btn.primary { background: rgba(255,255,255,0.14); }
+    .btn.danger { background: rgba(255, 60, 60, 0.18); }
+
+    .hint { margin: 10px 4px 0; color: var(--muted); min-height: 22px; }
+
+    .logHeader { display: flex; justify-content: space-between; align-items: center; }
+    h2 { margin: 0 0 10px; }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .table th, .table td { padding: 12px 12px; border-bottom: 1px solid var(--border); }
+    .table th { text-align: left; color: var(--muted); font-weight: 700; }
+    .table tr:last-child td { border-bottom: none; }
+
+    .foot { margin-top: 18px; color: var(--muted); text-align: center; }
+    .mono { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>Plank</h1>
+      <div class="sub mono">
+        <span id="streak">Streak: 0</span>
+        <span id="highScore">High score: 0:00</span>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="plank">Plank</button>
+      <button class="tab" data-tab="log">Log</button>
+    </nav>
+
+    <main>
+      <!-- TAB 1 -->
+      <section id="tab-plank" class="panel active">
+        <div class="timer mono" id="timer">0:00</div>
+
+        <div class="buttons">
+          <button id="startBtn" class="btn primary">Start</button>
+          <button id="stopBtn" class="btn" disabled>Stop</button>
+        </div>
+
+        <p class="hint" id="status"></p>
+      </section>
+
+      <!-- TAB 2 -->
+      <section id="tab-log" class="panel">
+        <div class="logHeader">
+          <h2>Log</h2>
+          <button id="clearBtn" class="btn danger">Clear</button>
+        </div>
+
+        <table class="table mono">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Plank</th>
+            </tr>
+          </thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <small>Local-only (saved on this phone).</small>
+    </footer>
+  </div>
+
+  <script>
+    // --- Storage key ---
+    const KEY = "plankTimer.v1";
+
+    // --- State ---
+    let state = load() ?? {
+      highScoreSec: 0,
+      streak: 0,
+      lastDoneDate: null,  // "YYYY-MM-DD"
+      logs: []             // [{ date: "YYYY-MM-DD", seconds: number }]
+    };
+
+    let running = false;
+    let startMs = 0;
+    let tickId = null;
+
+    // --- Elements ---
+    const timerEl = document.getElementById("timer");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn  = document.getElementById("stopBtn");
+    const streakEl = document.getElementById("streak");
+    const highEl   = document.getElementById("highScore");
+    const logBody  = document.getElementById("logBody");
+    const statusEl = document.getElementById("status");
+    const clearBtn = document.getElementById("clearBtn");
+
+    // --- Tabs ---
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
+      });
+    });
+
+    // --- Helpers ---
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function fmt(sec) {
+      sec = Math.max(0, Math.floor(sec));
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m}:${pad2(s)}`;
+    }
+    function todayKey(d = new Date()) {
+      const y = d.getFullYear();
+      const m = pad2(d.getMonth() + 1);
+      const day = pad2(d.getDate());
+      return `${y}-${m}-${day}`;
+    }
+    function yesterdayKey() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return todayKey(d);
+    }
+    function hasLogForDate(dateKey) {
+      return state.logs.some(x => x.date === dateKey);
+    }
+
+    function save() {
+      localStorage.setItem(KEY, JSON.stringify(state));
+    }
+    function load() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function render() {
+      streakEl.textContent = `Streak: ${state.streak}`;
+      highEl.textContent = `High score: ${fmt(state.highScoreSec)}`;
+
+      // Render log newest first
+      const rows = [...state.logs].sort((a,b) => (a.date < b.date ? 1 : -1));
+      if (rows.length === 0) {
+        logBody.innerHTML = `<tr><td colspan="2" style="color:#aab2c0;">No logs yet.</td></tr>`;
+        return;
+      }
+      logBody.innerHTML = rows.map(r => `
+        <tr>
+          <td>${r.date}</td>
+          <td>${fmt(r.seconds)}</td>
+        </tr>
+      `).join("");
+    }
+
+    // --- Timer ---
+    function start() {
+      if (running) return;
+      running = true;
+      startMs = Date.now();
+      statusEl.textContent = "Timer running…";
+
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+
+      tickId = setInterval(() => {
+        const sec = (Date.now() - startMs) / 1000;
+        timerEl.textContent = fmt(sec);
+      }, 200);
+    }
+
+    function stop() {
+      if (!running) return;
+      running = false;
+      clearInterval(tickId);
+      tickId = null;
+
+      const elapsedSec = Math.floor((Date.now() - startMs) / 1000);
+      timerEl.textContent = fmt(elapsedSec);
+
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+
+      const today = todayKey();
+      const alreadyLoggedToday = hasLogForDate(today);
+
+      // Log time (your "log sheet" requirement)
+      state.logs.push({ date: today, seconds: elapsedSec });
+
+      // High score
+      if (elapsedSec > state.highScoreSec) {
+        state.highScoreSec = elapsedSec;
+        statusEl.textContent = `New high score: ${fmt(elapsedSec)} ✅`;
+      } else {
+        statusEl.textContent = `Logged: ${fmt(elapsedSec)}`;
+      }
+
+      // Streak (only update once per day)
+      if (!alreadyLoggedToday) {
+        if (state.lastDoneDate === yesterdayKey()) {
+          state.streak += 1;
+        } else {
+          state.streak = 1;
+        }
+        state.lastDoneDate = today;
+      }
+
+      save();
+      render();
+    }
+
+    startBtn.addEventListener("click", start);
+    stopBtn.addEventListener("click", stop);
+
+    clearBtn.addEventListener("click", () => {
+      if (!confirm("Clear all logs, streak, and high score?")) return;
+      state = { highScoreSec: 0, streak: 0, lastDoneDate: null, logs: [] };
+      save();
+      timerEl.textContent = "0:00";
+      statusEl.textContent = "";
+      render();
+    });
+
+    // Init
+    render();
+  </script>
+</body>
+</html>
